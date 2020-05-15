@@ -3,23 +3,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Persistence
 {
-    public class DataContext : DbContext
-    {
-        public DataContext(DbContextOptions options) : base(options)
-        {
-        }
+      public class DataContext : DbContext
+      {
+            public DataContext(DbContextOptions options) : base(options)
+            {
+            }
 
-        // Create Table
-        public DbSet<Value> Values { get; set; }
+            // Create Table
+            public DbSet<Value> Values { get; set; }
+            public DbSet<Activity> Activities { get; set; }
 
-        // Add data to tables
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            builder.Entity<Value>()
-                .HasData(
-                    new Value { Id = 1, Name = "Value 101" },
-                    new Value { Id = 2, Name = "Value 102" },
-                    new Value { Id = 3, Name = "Value 103" });
-        }
-    }
+            // Add data to tables
+            protected override void OnModelCreating(ModelBuilder builder)
+            {
+                  builder.Entity<Value>()
+                      .HasData(
+                          new Value { Id = 1, Name = "Value 101" },
+                          new Value { Id = 2, Name = "Value 102" },
+                          new Value { Id = 3, Name = "Value 103" });
+            }
+      }
 }
