@@ -10,6 +10,15 @@ PERSISTENCE
 Data Access Layer
 Business Logic Layer
 
+Project Building Steps
+===========================
+
+1. Building skeleton api
+2. Building skeleton client
+3. Adding CORS support
+4. Building CRUD operations on API
+4. Building CRUD operations on client
+
 Commands
 ===========================
 
