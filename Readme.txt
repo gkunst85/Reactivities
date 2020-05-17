@@ -17,7 +17,9 @@ Project Building Steps
 2. Building skeleton client
 3. Adding CORS support
 4. Building CRUD operations on API
-4. Building CRUD operations on client
+5. Building CRUD operations on client
+6. Updating the data localy on app state
+7. Connecting axios to the client
 
 Commands
 ===========================
@@ -58,6 +60,8 @@ Migrations:
 
       dotnet ef migrations add "[migrationName]" -p [projectName] -s [startup projectName]
       dotnet ef migrations add "SeedValues" -p Persistence/ -s API/
+
+      dotnet ef database drop -p [projectName] -s [startup projectName]
       
 GIT
 
