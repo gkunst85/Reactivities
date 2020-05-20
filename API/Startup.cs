@@ -1,4 +1,5 @@
 using Application.Activities;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,6 +27,8 @@ namespace API
                   {
                         opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
                   });
+
+                  // Need specifying of 1 class that is using the handler
                   services.AddMediatR(typeof(List.Handler).Assembly);
                   services.AddCors(opt =>
                   {
@@ -36,7 +39,12 @@ namespace API
                                     .WithOrigins("http://localhost:3000");
                         });
                   });
-                  services.AddControllers();
+                  services.AddControllers()
+                          .AddFluentValidation(cfg =>
+                          {
+                                // Need specifying of 1 class that is using the fluent validations
+                                cfg.RegisterValidatorsFromAssemblyContaining<Create>();
+                          });
             }
 
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

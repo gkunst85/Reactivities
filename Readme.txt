@@ -20,6 +20,9 @@ Project Building Steps
 5. Building CRUD operations on client
 6. Updating the data localy on app state
 7. Connecting axios to the client
+8. Adding mobX and creating stores
+9. Creating Routing with React Router
+10. Error handling and validation
 
 Commands
 ===========================
