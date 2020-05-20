@@ -28,9 +28,9 @@ namespace API.Controllers
             }
 
             [HttpGet("{id}")]
-            public async Task<ActionResult<Activity>> Details(Guid id, CancellationToken ct)
+            public async Task<ActionResult<Activity>> Details(Guid id)
             {
-                  return await _mediator.Send(new Details.Query { Id = id }, ct);
+                  return await _mediator.Send(new Details.Query { Id = id });
             }
 
             [HttpPost]
