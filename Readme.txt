@@ -69,3 +69,8 @@ Migrations:
 GIT
 
       git clone https://github.com/gkunst85/Reactivities.git
+
+Patterns
+===========================
+1. USED -> CQRS & Mediator Pattern
+2. ALTERNATIVE -> Repository Pattern
