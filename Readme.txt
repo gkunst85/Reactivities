@@ -22,7 +22,7 @@ Project Building Steps
 7. Connecting axios to the client
 8. Adding mobX and creating stores
 9. Creating Routing with React Router
-10. Error handling and validation
+10. Error handling using middlewares (Server & Client) and validation
 
 Commands
 ===========================
