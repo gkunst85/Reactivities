@@ -2,13 +2,13 @@ Project Stracture
 ===========================
 
 API - Presentation Layer
-APPLICATION -
+APPLICATION - Business Logic Layer
 DOMAIN -
-PERSISTENCE
+PERSISTENCE - Data Access Layer
 
 
-Data Access Layer
-Business Logic Layer
+
+
 
 Project Building Steps
 ===========================
@@ -23,6 +23,10 @@ Project Building Steps
 8. Adding mobX and creating stores
 9. Creating Routing with React Router
 10. Error handling using middlewares (Server & Client) and validation
+11. Create generic forms and validation
+12. ASP.NET Core Identity
+
+
 
 Commands
 ===========================
@@ -56,6 +60,11 @@ NPM
 
       // Adds reference from one project to another 
       dotnet add reference ../[ProjectFolder]/
+
+      // ONLY AVAILABLE IN DEVELOPMENT MODE - setting up keys in local machine
+      dotnet user-secrets
+      dotnet user-secrets init -p [projectName]
+      dotnet user-secrets set "TokenKey" "super secret key" -p API
 
 Migrations:
       
