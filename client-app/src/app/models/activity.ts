@@ -8,10 +8,12 @@ export interface IActivity {
   venue: string;
 }
 
+// Extend the IActivity interface and add a time property
 export interface IActivityFormValues extends Partial<IActivity> {
   time?: Date;
 }
 
+// Define a class with a initializer constructor
 export class ActivityFormValues implements IActivityFormValues {
   id?: string = undefined;
   title: string = "";
@@ -23,8 +25,10 @@ export class ActivityFormValues implements IActivityFormValues {
   venue: string = "";
 
   constructor(init?: IActivityFormValues) {
+    // Check that received activity obj is not null and that it has a date
     if (init && init.date) init.time = init.date;
 
+    // Assign the new object with the received fields
     Object.assign(this, init);
   }
 }
