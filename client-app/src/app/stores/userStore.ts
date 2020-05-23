@@ -1,10 +1,17 @@
+import { history } from "./../../index";
+import { RootStore } from "./rootStore";
 import { IUser } from "./../models/user";
-import { createContext } from "react";
-import { observable, computed, action } from "mobx";
+import { observable, computed, action, runInAction } from "mobx";
 import { IUserFormValues } from "../models/user";
 import agent from "../api/agent";
 
-class UserStore {
+export default class UserStore {
+  rootStore: RootStore;
+
+  constructor(rootStore: RootStore) {
+    this.rootStore = rootStore;
+  }
+
   @observable user: IUser | null = null;
 
   @computed get isLoggedIn() {
@@ -14,11 +21,15 @@ class UserStore {
   @action login = async (values: IUserFormValues) => {
     try {
       const user = await agent.User.login(values);
-      this.user = user;
+
+      runInAction(() => {
+        this.user = user;
+      });
+
+      console.log(user);
+      history.push("/activities");
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   };
 }
-
-export default createContext(new UserStore());
