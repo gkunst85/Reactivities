@@ -9,18 +9,20 @@ import { combineValidators, isRequired } from "revalidate";
 import ErrorMessage from "../../app/common/form/ErrorMessage";
 
 const validate = combineValidators({
+  username: isRequired("username"),
+  displayName: isRequired("display name"),
   email: isRequired("email"),
   password: isRequired("password"),
 });
 
-const LoginForm = () => {
+const RegisterForm = () => {
   const rootStore = useContext(RootStoreContext);
-  const { login } = rootStore.userStore;
+  const { register } = rootStore.userStore;
 
   return (
     <FinalForm
       onSubmit={(values: IUserFormValues) =>
-        login(values).catch((error) => ({ [FORM_ERROR]: error }))
+        register(values).catch((error) => ({ [FORM_ERROR]: error }))
       }
       validate={validate}
       render={({
@@ -35,8 +37,14 @@ const LoginForm = () => {
           <Header
             as="h2"
             color="teal"
-            content="Login to Reactivities"
+            content="Register to Reactivities"
             textAlign="center"
+          />
+          <Field component={TextInput} name="username" placeholder="Username" />
+          <Field
+            component={TextInput}
+            name="displayName"
+            placeholder="Display Name"
           />
           <Field component={TextInput} name="email" placeholder="Email" />
           <Field
@@ -56,7 +64,7 @@ const LoginForm = () => {
             loading={submitting}
             color="teal"
             fluid
-            content="Login"
+            content="Register"
           />
         </Form>
       )}
@@ -64,4 +72,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default RegisterForm;
