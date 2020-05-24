@@ -10,6 +10,7 @@ namespace Persistence
             // Create Table
             public DbSet<Value> Values { get; set; }
             public DbSet<Activity> Activities { get; set; }
+            public DbSet<UserActivity> UserActivities { get; set; }
 
             public DataContext(DbContextOptions options) : base(options) { }
 
@@ -19,6 +20,18 @@ namespace Persistence
                   // Needed for IdentityDbContext
                   // Allows us when we create our migration to give our AppUser a primary key
                   base.OnModelCreating(builder);
+
+
+                  builder.Entity<UserActivity>(x => x.HasKey(ua => new { ua.AppUserId, ua.ActivityId }));
+
+                  // Defina a many to one to many relationships
+                  builder.Entity<UserActivity>().HasOne(u => u.AppUser)
+                                                .WithMany(a => a.UserActivities)
+                                                .HasForeignKey(u => u.AppUserId);
+
+                  builder.Entity<UserActivity>().HasOne(a => a.Activity)
+                                                .WithMany(u => u.UserActivities)
+                                                .HasForeignKey(a => a.ActivityId);
 
                   // Enters data to the database 
                   builder.Entity<Value>()

@@ -25,6 +25,7 @@ Project Building Steps
 10. Error handling using middlewares (Server & Client) and validation
 11. Create generic forms and validation
 12. ASP.NET Core Identity
+13. Login and Registeration
 
 
 
