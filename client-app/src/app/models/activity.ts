@@ -6,6 +6,9 @@ export interface IActivity {
   date: Date;
   city: string;
   venue: string;
+  isGoing: boolean;
+  isHost: boolean;
+  attendees: IAttendee[];
 }
 
 // Extend the IActivity interface and add a time property
@@ -31,4 +34,11 @@ export class ActivityFormValues implements IActivityFormValues {
     // Assign the new object with the received fields
     Object.assign(this, init);
   }
+}
+
+export interface IAttendee {
+  username: string;
+  displayName: string;
+  image: string;
+  isHost: boolean;
 }

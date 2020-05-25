@@ -2,6 +2,7 @@ import React from "react";
 import { Segment, Grid, Icon } from "semantic-ui-react";
 import { IActivity } from "../../../app/models/activity";
 import { format } from "date-fns";
+import { observer } from "mobx-react-lite";
 
 const ActivityDetailsInfo: React.FC<{ activity: IActivity }> = ({
   activity,
@@ -47,4 +48,4 @@ const ActivityDetailsInfo: React.FC<{ activity: IActivity }> = ({
   );
 };
 
-export default ActivityDetailsInfo;
+export default observer(ActivityDetailsInfo);
