@@ -11,57 +11,57 @@ using Domain;
 
 namespace Application.Activities
 {
-    public class Attend
-    {
-        public class Command : IRequest
-        {
-            public Guid Id { get; set; }
-        }
-
-        public class Handler : IRequestHandler<Command>
-        {
-            private readonly DataContext _context;
-            private readonly IUserAccessor _userAccessor;
-
-            public Handler(DataContext context, IUserAccessor userAccessor)
+      public class Attend
+      {
+            public class Command : IRequest
             {
-                _userAccessor = userAccessor;
-                _context = context;
+                  public Guid Id { get; set; }
             }
 
-            public async Task<Unit> Handle(Command command, CancellationToken cancellationToken)
+            public class Handler : IRequestHandler<Command>
             {
-                var activity = await _context.Activities.FindAsync(command.Id);
-                if (activity == null)
-                    throw new RestException(HttpStatusCode.NotFound, new { Activity = "Could not find activity" });
+                  private readonly DataContext _context;
+                  private readonly IUserAccessor _userAccessor;
 
-                var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUsername());
+                  public Handler(DataContext context, IUserAccessor userAccessor)
+                  {
+                        _userAccessor = userAccessor;
+                        _context = context;
+                  }
 
-                if (user == null)
-                    throw new RestException(HttpStatusCode.NotFound, new { User = "Could not find user" });
+                  public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+                  {
+                        var activity = await _context.Activities.FindAsync(request.Id);
+                        if (activity == null)
+                              throw new RestException(HttpStatusCode.NotFound, new { Activity = "Could not find activity" });
 
-                var attendance = await _context.UserActivities.SingleOrDefaultAsync(x =>
-                x.ActivityId == activity.Id && x.AppUserId == user.Id);
+                        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUsername());
 
-                if (attendance != null)
-                    throw new RestException(HttpStatusCode.BadRequest, new { Attendance = "Already attending this activity" });
+                        if (user == null)
+                              throw new RestException(HttpStatusCode.NotFound, new { User = "Could not find user" });
 
-                attendance = new UserActivity
-                {
-                    Activity = activity,
-                    AppUser = user,
-                    IsHost = false,
-                    DateJoined = DateTime.Now
-                };
+                        var attendance = await _context.UserActivities.SingleOrDefaultAsync(x =>
+                        x.ActivityId == activity.Id && x.AppUserId == user.Id);
 
-                _context.UserActivities.Add(attendance);
+                        if (attendance != null)
+                              throw new RestException(HttpStatusCode.BadRequest, new { Attendance = "Already attending this activity" });
 
-                var success = await _context.SaveChangesAsync() > 0;
-                if (!success)
-                    throw new Exception("Problem saving changes");
+                        attendance = new UserActivity
+                        {
+                              Activity = activity,
+                              AppUser = user,
+                              IsHost = false,
+                              DateJoined = DateTime.Now
+                        };
 
-                return Unit.Value;
+                        _context.UserActivities.Add(attendance);
+
+                        var success = await _context.SaveChangesAsync() > 0;
+                        if (!success)
+                              throw new Exception("Problem saving changes");
+
+                        return Unit.Value;
+                  }
             }
-        }
-    }
+      }
 }

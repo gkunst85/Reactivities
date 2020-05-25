@@ -5,6 +5,7 @@ using Application.Interfaces;
 using AutoMapper;
 using Domain;
 using FluentValidation.AspNetCore;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,112 +23,118 @@ using Persistence;
 
 namespace API
 {
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddDbContext<DataContext>(opt =>
+      public class Startup
+      {
+            public Startup(IConfiguration configuration)
             {
-                opt.UseLazyLoadingProxies();
-                opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
-            });
+                  Configuration = configuration;
+            }
 
-            // Need specifying of 1 class that is using the handler
-            services.AddMediatR(typeof(List.Handler).Assembly);
+            public IConfiguration Configuration { get; }
 
-            services.AddAutoMapper(typeof(List.Handler).Assembly);
-
-            // Enable CORS
-            services.AddCors(opt =>
+            // This method gets called by the runtime. Use this method to add services to the container.
+            public void ConfigureServices(IServiceCollection services)
             {
-                opt.AddPolicy("CorsPolicy", policy =>
-                      {
-                          policy.AllowAnyHeader()
-                                      .AllowAnyMethod()
-                                      .WithOrigins("http://localhost:3000");
-                      });
-            });
-
-            // Add autorize filter policy to all the controllers & Add fluent validation
-            services.AddControllers(opt =>
-            {
-                var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-
-                opt.Filters.Add(new AuthorizeFilter(policy));
-            })
-                    .AddFluentValidation(cfg =>
-            {
-                // Need specifying of 1 class that is using the fluent validations
-                cfg.RegisterValidatorsFromAssemblyContaining<Create>();
-            });
-
-            // Add Identity
-            var builder = services.AddIdentityCore<AppUser>();
-            var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
-            identityBuilder.AddEntityFrameworkStores<DataContext>();
-            identityBuilder.AddSignInManager<SignInManager<AppUser>>();
-
-            services.AddAuthorization(opt =>
-            {
-                opt.AddPolicy("IsActivityHost", policy =>
-                {
-                    policy.Requirements.Add(new IsHostRequirement());
-                });
-            });
-
-            services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
-
-            // In dev enviorment - get the key from user-secrets
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                  .AddJwtBearer(opt =>
+                  services.AddDbContext<DataContext>(opt =>
                   {
-                      opt.TokenValidationParameters = new TokenValidationParameters
-                      {
-                          ValidateIssuerSigningKey = true,
-                          IssuerSigningKey = key,
-                          ValidateAudience = false,
-                          ValidateIssuer = false
-                      };
+                        opt.UseLazyLoadingProxies();
+                        opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
                   });
 
-            services.AddScoped<IJwtGenerator, JwtGenerator>();
-            services.AddScoped<IUserAccessor, UserAccessor>();
-        }
+                  // Need specifying of 1 class that is using the handler
+                  services.AddMediatR(typeof(List.Handler).Assembly);
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            app.UseMiddleware<ErrorHandlingMiddleware>();
+                  services.AddAutoMapper(typeof(List.Handler).Assembly);
 
-            // if (env.IsDevelopment())
-            // {
-            //       app.UseDeveloperExceptionPage();
-            // }
+                  // Enable CORS
+                  services.AddCors(opt =>
+                  {
+                        opt.AddPolicy("CorsPolicy", policy =>
+                        {
+                              policy.AllowAnyHeader()
+                                    .AllowAnyMethod()
+                                    .WithOrigins("http://localhost:3000");
+                        });
+                  });
 
-            // Redirect http to https
-            // app.UseHttpsRedirection();
+                  // Add autorize filter policy to all the controllers & Add fluent validation
+                  services.AddControllers(opt =>
+                  {
+                        var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
 
-            app.UseRouting();
+                        opt.Filters.Add(new AuthorizeFilter(policy));
+                  })
+                          .AddFluentValidation(cfg =>
+                  {
+                        // Need specifying of 1 class that is using the fluent validations
+                        cfg.RegisterValidatorsFromAssemblyContaining<Create>();
+                  });
 
-            app.UseCors("CorsPolicy");
+                  // Add Identity
+                  var builder = services.AddIdentityCore<AppUser>();
+                  var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
+                  identityBuilder.AddEntityFrameworkStores<DataContext>();
+                  identityBuilder.AddSignInManager<SignInManager<AppUser>>();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+                  services.AddAuthorization(opt =>
+                  {
+                        opt.AddPolicy("IsActivityHost", policy =>
+                  {
+                        policy.Requirements.Add(new IsHostRequirement());
+                  });
+                  });
 
-            app.UseEndpoints(endpoints =>
+                  services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
+
+                  // In dev enviorment - get the key from user-secrets
+                  var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
+
+                  services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                        .AddJwtBearer(opt =>
+                        {
+                              opt.TokenValidationParameters = new TokenValidationParameters
+                              {
+                                    ValidateIssuerSigningKey = true,
+                                    IssuerSigningKey = key,
+                                    ValidateAudience = false,
+                                    ValidateIssuer = false
+                              };
+                        });
+
+                  services.AddScoped<IJwtGenerator, JwtGenerator>();
+                  services.AddScoped<IUserAccessor, UserAccessor>();
+                  services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+
+                  // Using CloudinaryDotNet nuget
+                  // Get configuration section from dotnet user-secrets (or any other configuration) 
+                  // and apply on CloudinarySettings class
+                  services.Configure<CloudinarySettings>(Configuration.GetSection("Cloudinary"));
+            }
+
+            // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             {
-                endpoints.MapControllers();
-            });
-        }
-    }
+                  app.UseMiddleware<ErrorHandlingMiddleware>();
+
+                  // if (env.IsDevelopment())
+                  // {
+                  //       app.UseDeveloperExceptionPage();
+                  // }
+
+                  // Redirect http to https
+                  // app.UseHttpsRedirection();
+
+                  app.UseRouting();
+
+                  app.UseCors("CorsPolicy");
+
+                  app.UseAuthentication();
+                  app.UseAuthorization();
+
+                  app.UseEndpoints(endpoints =>
+                  {
+                        endpoints.MapControllers();
+                  });
+            }
+      }
 }
