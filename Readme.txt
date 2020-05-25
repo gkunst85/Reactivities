@@ -26,7 +26,7 @@ Project Building Steps
 11. Create generic forms and validation
 12. ASP.NET Core Identity
 13. Login and Registeration
-
+14. Entity Framework Core Relationships
 
 
 Commands
