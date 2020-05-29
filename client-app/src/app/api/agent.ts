@@ -1,3 +1,4 @@
+import { IProfile, IPhoto } from "./../models/profile";
 import { IUserFormValues } from "./../models/user";
 import axios, { AxiosResponse } from "axios";
 import { history } from "./../../index";
@@ -60,6 +61,16 @@ const requests = {
     axios.put(url, body).then(sleep(1000)).then(responseBody),
   delete: (url: string) =>
     axios.delete(url).then(sleep(1000)).then(responseBody),
+  postForm: (url: string, file: Blob) => {
+    let formData = new FormData();
+    formData.append("File", file);
+
+    return axios
+      .post(url, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then(responseBody);
+  },
 };
 
 const Activities = {
@@ -81,4 +92,13 @@ const User = {
     requests.post("/user/register", user),
 };
 
-export default { Activities, User };
+const Profiles = {
+  get: (username: string): Promise<IProfile> =>
+    requests.get(`/profiles/${username}`),
+  uploadPhoto: (photo: Blob): Promise<IPhoto> =>
+    requests.postForm(`/photos`, photo),
+  setMainPhoto: (id: string) => requests.post(`/photos/${id}/setmain`, {}),
+  delete: (id: string) => requests.delete(`/photos/${id}`),
+};
+
+export default { Activities, User, Profiles };
