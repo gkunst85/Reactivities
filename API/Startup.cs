@@ -1,5 +1,7 @@
 using System.Text;
+using System.Threading.Tasks;
 using API.Middlewares;
+using API.SignalR;
 using Application.Activities;
 using Application.Interfaces;
 using AutoMapper;
@@ -99,6 +101,23 @@ namespace API
                                     ValidateAudience = false,
                                     ValidateIssuer = false
                               };
+
+                              // For signalR token support
+                              opt.Events = new JwtBearerEvents
+                              {
+                                    OnMessageReceived = context =>
+                                    {
+                                          var accessToken = context.Request.Query["access_token"];
+                                          var path = context.HttpContext.Request.Path;
+
+                                          if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/chat"))
+                                          {
+                                                context.Token = accessToken;
+                                          }
+
+                                          return Task.CompletedTask;
+                                    }
+                              };
                         });
 
                   services.AddScoped<IJwtGenerator, JwtGenerator>();
@@ -109,6 +128,8 @@ namespace API
                   // Get configuration section from dotnet user-secrets (or any other configuration) 
                   // and apply on CloudinarySettings class
                   services.Configure<CloudinarySettings>(Configuration.GetSection("Cloudinary"));
+
+                  services.AddSignalR();
             }
 
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -134,6 +155,7 @@ namespace API
                   app.UseEndpoints(endpoints =>
                   {
                         endpoints.MapControllers();
+                        endpoints.MapHub<ChatHub>("/chat");
                   });
             }
       }

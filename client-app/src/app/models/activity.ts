@@ -9,6 +9,16 @@ export interface IActivity {
   isGoing: boolean;
   isHost: boolean;
   attendees: IAttendee[];
+  comments: IComment[];
+}
+
+export interface IComment {
+  id: string;
+  createdAt: string;
+  body: string;
+  username: string;
+  displayName: string;
+  image: string;
 }
 
 // Extend the IActivity interface and add a time property
