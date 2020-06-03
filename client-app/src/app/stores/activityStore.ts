@@ -46,13 +46,25 @@ export default class ActivityStore {
       });
 
     this.hubConnection.on("ReceiveComment", (comment) => {
-      this.activity!.comments.push(comment);
+      runInAction(() => {
+        this.activity!.comments.push(comment);
+      })
     });
   };
 
   @action stopHubConnection = () => {
     this.hubConnection!.stop();
   };
+
+  @action addComment = async (values: any) => {
+    values.activityId = this.activity!.id;
+
+    try {
+      await this.hubConnection!.invoke("SendComment", values);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   @computed get activitiesByDate() {
     return this.groupActivitiesByDate(
@@ -159,6 +171,8 @@ export default class ActivityStore {
 
       activity.attendees = attendees;
       activity.isHost = true;
+
+      activity.comments = [];
 
       runInAction("creating activity", () => {
         this.activityRegistry.set(activity.id, activity);
